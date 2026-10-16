@@ -1,0 +1,36 @@
+name: Compile Shared Object (.so)
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository code
+      uses: actions/checkout@v4
+
+    - name: Compile C code to .so
+      run: |
+        # Change 'mycode.c' to your actual file name
+        # Change 'libmycode.so' to your preferred library name
+        if [ -f mycode.c ]; then
+          gcc -c -fPIC mycode.c -o mycode.o
+          gcc -shared -o libmycode.so mycode.o
+        elif [ -f main.c ]; then
+          gcc -c -fPIC main.c -o main.o
+          gcc -shared -o libmycode.so main.o
+        else
+          echo "Looking for any .c files to compile..."
+          gcc -c -fPIC *.c -o mycode.o || true
+          gcc -shared -o libmycode.so *.o || true
+        fi
+
+    - name: Upload Compiled .so File
+      uses: actions/upload-artifact@v4
+      with:
+        name: compiled-shared-object
+        path: libmycode.so
