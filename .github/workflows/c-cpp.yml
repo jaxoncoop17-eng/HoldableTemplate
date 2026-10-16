@@ -1,0 +1,25 @@
+name: Compile C++ Shared Object
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Compile .so file
+      run: |
+        g++ -c -fPIC main.cpp -o main.o
+        g++ -shared -o libmycode.so main.o
+
+    - name: Upload compiled library
+      uses: actions/upload-artifact@v4
+      with:
+        name: compiled-shared-object
+        path: libmycode.so
